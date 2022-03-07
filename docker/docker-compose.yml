@@ -1,0 +1,66 @@
+version: "3.8"
+
+# [docs](https://docs.docker.com/compose/compose-file/compose-file-v3/)
+services:
+  # init-pg:
+  #   # FIXME: this service isn't yet able to contact pg service.
+  #   container_name: init-pgdb
+  #   image: postgres:latest
+  #   # Execute shell command.
+  #   command: >
+  #     createuser --username=postgres $USER --createdb --createrole &&
+  #     createdb --username=postgres $USER --owner=$USER
+  #   volumes:
+  #     - /run/postgresql:/var/run/postgresql
+  #   # connect the current service with the specified one after service tag (service: <service_name>)
+  #   network_mode: service:pg
+
+  pg:
+    container_name: pgdb
+    image: postgres:latest
+    # automatically launch containers on docker startup.
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      # bind host postgres socket file with container one.
+      - /run/postgresql:/var/run/postgresql
+      - pgsql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    container_name: redisdb
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis:/var/lib/redis/data
+    ports:
+      - "6379:6379"
+
+  maria:
+    container_name: mariadb
+    image: mariadb:latest
+    restart: always
+    environment:
+      # TODO: create current linux user with an empty password on mysql server. 
+      - MYSQL_USER=${MYSQL_USER:-$USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-changeme}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      # bind host mysql socket file with container one.
+      - /run/mysqld/mysql.sock:/run/mysqld/mysql.sock
+      - maria:/var/lib/mysql/data
+    ports:
+      - "3306:3306"
+  
+volumes:
+  pgsql:
+  redis:
+  maria:
+
+# currently you have to execute these commands after `docker-compose up -d` to create
+# a `role` and `database` for the current host user.
+# docker exec -it --user=postgres pgdb createuser $USER --createdb --createrole
+# docker exec -it --user=postgres pgdb createdb $USER --owner=$USER
