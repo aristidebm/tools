@@ -42,7 +42,6 @@
 \setenv PSQL_EDITOR 'nvim'
 \setenv PSQL_EDITOR_LINENUMBER_ARG '+'
 
-
 -------------------------------- Shell commands ----------------------------------
 \set ls '\\! ls -larth'
 \set pwd '\\! pwd'
@@ -74,6 +73,11 @@
 
 -- explain a query
 \set eav 'EXPLAIN ANALYZE VERBOSE'
+
+-- Switch pagers with :x and :xx commands
+\set x '\\setenv PSQL_PAGER less'
+\set xx '\\setenv PSQL_PAGER \'pspg -bX --no-mouse\''
+
 
 -------------------------------- Change Output -----------------------------------
 
@@ -108,7 +112,7 @@
 
 -- nulls: how to display null values.
 -- Values: string
-\pset null ''
+\pset null '∅'
 
 -- numericlocale: display local-specific character to separate digits.
 -- values: on, off. Without values, will toggle.
@@ -267,6 +271,8 @@
 \echo '\t:queries                                                                  '
 \echo '\t:menu                                                                     '
 \echo '\t:uptime                                                                   '
+\echo '\t:x                                    set pager to less                   '
+\echo '\t:xx                                   set pager to pspg                   '
 \echo '----------------------------------------------------------------------------'
 \echo '                                 Shell commands                             '
 \echo '----------------------------------------------------------------------------'
